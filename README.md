@@ -39,11 +39,11 @@ Features
 
 #### Clone the repository:
 ``` bash 
-git clone https://github.com/yourusername/cat-api-project.git
+git clone https://github.com/samayunPathan/Beego-assignment.git
 ```
 #### Go project directory
 ``` bash
-cd cat-api-project
+cd Beego-assignment
 ```
 #### Install Go dependencies:
 ```bash
