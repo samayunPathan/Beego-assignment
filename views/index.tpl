@@ -19,7 +19,7 @@
             <input type="text" id="breedSearch" placeholder="Search for breeds...">
             <ul id="breedList"></ul>
         </div>
-
+        <div id="favoritesContainer" style="display: none;"></div>
         <div id="catCard">
             <div id="catContainer"></div>
             <div id="votingContainer">

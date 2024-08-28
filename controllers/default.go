@@ -1,10 +1,12 @@
 package controllers
 
 import (
+	"bytes"
 	"cat-api-project/models"
 	"encoding/json"
 	"github.com/beego/beego/v2/core/config"
 	"github.com/beego/beego/v2/server/web"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -95,18 +97,95 @@ func (c *MainController) GetBreedImages() {
 	c.ServeJSON()
 }
 
+// ======  favorite  ======
+
 func (c *MainController) AddFavorite() {
+
 	var favoriteData struct {
 		CatId string `json:"catId"`
 	}
+
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &favoriteData); err != nil {
 		c.Data["json"] = map[string]string{"error": "Invalid request body"}
 		c.ServeJSON()
 		return
 	}
 
-	// Here you would typically save the favorite to a database
-	// For now, we'll just return a success message
-	c.Data["json"] = map[string]string{"message": "Cat added to favorites"}
-	c.ServeJSON()
+	// Prepare the request body for The Cat API
+	apiURL := "https://api.thecatapi.com/v1/favourites/"
+	requestBody := map[string]string{
+		"image_id": favoriteData.CatId,
+		"sub_id":   "demo-0.060766054451763274", // Replace with your actual sub_id
+	}
+
+	jsonData, err := json.Marshal(requestBody)
+	if err != nil {
+		c.Data["json"] = map[string]string{"error": "Failed to marshal JSON"}
+		c.ServeJSON()
+		return
+	}
+
+	// Make a POST request to The Cat API
+	req, err := http.NewRequest("POST", apiURL, bytes.NewBuffer(jsonData))
+	if err != nil {
+		c.Data["json"] = map[string]string{"error": "Failed to create HTTP request"}
+		c.ServeJSON()
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("x-api-key", "live_5NZPJugs0kuNWqvp9JSSzI7EFywdFCC6hdRiwktABBZq9Mmfwi6jjbUcd4rqSlEw") // Replace with your actual API key
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		c.Data["json"] = map[string]string{"error": "Failed to send request to The Cat API"}
+		c.ServeJSON()
+		return
+	}
+	defer resp.Body.Close()
+
+	// Read the response body
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		c.Data["json"] = map[string]string{"error": "Failed to read response from The Cat API"}
+		c.ServeJSON()
+		return
+	}
+
+	// Return the response from The Cat API as JSON
+	c.Ctx.ResponseWriter.WriteHeader(resp.StatusCode)
+	c.Ctx.ResponseWriter.Write(body)
+}
+
+func (c *MainController) GetFavorites() {
+	// Prepare the request to The Cat API
+	apiURL := "https://api.thecatapi.com/v1/favourites?sub_id=demo-0.060766054451763274" // Replace with your actual sub_id
+	req, err := http.NewRequest("GET", apiURL, nil)
+	if err != nil {
+		c.Data["json"] = map[string]string{"error": "Failed to create HTTP request"}
+		c.ServeJSON()
+		return
+	}
+	req.Header.Set("x-api-key", "live_5NZPJugs0kuNWqvp9JSSzI7EFywdFCC6hdRiwktABBZq9Mmfwi6jjbUcd4rqSlEw") // Replace with your actual API key
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		c.Data["json"] = map[string]string{"error": "Failed to send request to The Cat API"}
+		c.ServeJSON()
+		return
+	}
+	defer resp.Body.Close()
+
+	// Read the response body
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		c.Data["json"] = map[string]string{"error": "Failed to read response from The Cat API"}
+		c.ServeJSON()
+		return
+	}
+
+	// Return the response from The Cat API as JSON
+	c.Ctx.ResponseWriter.WriteHeader(resp.StatusCode)
+	c.Ctx.ResponseWriter.Write(body)
 }

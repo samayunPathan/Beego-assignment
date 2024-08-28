@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', () => {
     const breedSearch = document.getElementById('breedSearch');
     const breedList = document.getElementById('breedList');
@@ -11,12 +12,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const likeButton = document.getElementById('likeButton');
     const dislikeButton = document.getElementById('dislikeButton');
     const votingContainer = document.getElementById('votingContainer');
+    const favoritesContainer = document.getElementById('favoritesContainer');
 
     let breeds = [];
     let currentMode = 'voting';
     let currentCatId = null;
     let currentBreed = null;
     let autoImageInterval = null;
+    let favorites = [];
+    let currentFavoriteIndex = 0;
 
     const fetchBreeds = async () => {
         try {
@@ -63,33 +67,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const images = await response.json();
-            
+
             if (images.length === 0) {
                 console.error('No images found for the breed');
                 return;
             }
-            
+
             let currentImageIndex = 0;
-    
+
             const displayImage = () => {
                 const imageContainer = document.getElementById("catContainer");
                 if (!imageContainer) {
                     console.error('Image container not found');
                     return;
                 }
-                imageContainer.innerHTML = ""; // Clear the container
-    
+                imageContainer.innerHTML = "";
+
                 const img = document.createElement("img");
                 img.src = images[currentImageIndex].url;
-                img.width = 500; // Adjust the size as needed
+                img.width = 500;
                 img.height = 375;
-    
+
                 imageContainer.appendChild(img);
-    
-                // Move to the next image
+
                 currentImageIndex = (currentImageIndex + 1) % images.length;
             };
-    
+
             displayImage();
 
             if (currentMode === 'breeds') {
@@ -100,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error fetching cat by breed:', error);
         }
     };
-    
+
     const fetchRandomCat = async () => {
         try {
             const response = await fetch('/random-cat');
@@ -126,6 +129,60 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    const addFavorite = async (catId) => {
+        try {
+            const response = await fetch('/favorite', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ catId: catId })
+            });
+            const result = await response.json();
+            console.log(result.message || 'Favorite added successfully');
+        } catch (error) {
+            console.error('Error adding favorite:', error);
+        }
+    };
+
+    const fetchFavorites = async () => {
+        try {
+            const response = await fetch('/favorites');
+            favorites = await response.json();
+            console.log('Fetched favorites:', favorites);
+            if (favorites.length > 0) {
+                displayFavorites(favorites);
+            } else {
+                catContainer.innerHTML = '<p>No favorites yet!</p>';
+            }
+        } catch (error) {
+            console.error('Error fetching favorites:', error);
+        }
+    };
+
+    const displayFavorites = (favorites) => {
+        if (favorites.length === 0) {
+            catContainer.innerHTML = '<p>No favorites yet!</p>';
+            return;
+        }
+
+        let currentFavoriteIndex = 0;
+
+        const displayFavoriteImage = () => {
+            const favorite = favorites[currentFavoriteIndex];
+            catContainer.innerHTML = `<img src="${favorite.image.url}" alt="Favorite Cat" width="500" height="375">`;
+            currentCatId = favorite.image.id;
+
+            currentFavoriteIndex = (currentFavoriteIndex + 1) % favorites.length;
+        };
+
+        displayFavoriteImage();
+
+        if (currentMode === 'favs') {
+            autoImageInterval = setInterval(displayFavoriteImage, 3000);
+        }
+    };
+
     const setMode = (mode) => {
         currentMode = mode;
         document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
@@ -136,42 +193,27 @@ document.addEventListener('DOMContentLoaded', () => {
             clearInterval(autoImageInterval);
             autoImageInterval = null;
         }
+        catContainer.style.display = 'block';
+        breedSelector.style.display = 'none';
+        breedInfo.style.display = 'none';
+        votingContainer.style.display = 'none';
+
         if (mode === 'voting') {
             fetchRandomCat();
-            breedSelector.style.display = 'none';
-            breedInfo.style.display = 'none'; // Hide breed info in voting mode
+
         } else if (mode === 'breeds') {
             breedSelector.style.display = 'block';
-            breedInfo.style.display = 'block'; // Show breed info in breeds mode
-            catContainer.innerHTML = '';
-            breedInfo.innerHTML = '';
+            breedInfo.style.display = 'block'; 
+
             updateBreedList();
         } else if (mode === 'favs') {
-            breedSelector.style.display = 'none';
-            breedInfo.style.display = 'none'; // Hide breed info in favs mode
-            fetchRandomCat();
+            fetchFavorites();
         }
-
-
     };
 
-    votingBtn.addEventListener('click', () => {
-        setMode('voting');
-        breedSelector.style.display = 'none';
-        breedInfo.innerHTML = '';
-    });
-
-    breedsBtn.addEventListener('click', () => {
-        setMode('breeds');
-        breedSelector.style.display = 'block';
-    });
-
-    favsBtn.addEventListener('click', () => {
-        setMode('favs');
-        breedSelector.style.display = 'none';
-        breedInfo.innerHTML = '';
-        fetchRandomCat();
-    });
+    votingBtn.addEventListener('click', () => setMode('voting'));
+    breedsBtn.addEventListener('click', () => setMode('breeds'));
+    favsBtn.addEventListener('click', () => setMode('favs'));
 
     breedSearch.addEventListener('input', updateBreedList);
 
@@ -194,23 +236,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     favoriteButton.addEventListener('click', async () => {
         if (currentCatId) {
-            try {
-                await fetch(`/favorite`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ catId: currentCatId })
-                });
-                if (currentMode === 'voting') {
-                    fetchRandomCat();
-                }
-            } catch (error) {
-                console.error('Error adding to favorites:', error);
+            await addFavorite(currentCatId);
+            if (currentMode === 'voting') {
+                fetchRandomCat();
             }
         }
     });
 
     likeButton.addEventListener('click', () => handleVote('like'));
-
     dislikeButton.addEventListener('click', () => handleVote('dislike'));
 
     // Initial setup
@@ -218,5 +251,3 @@ document.addEventListener('DOMContentLoaded', () => {
         setMode('voting');
     });
 });
-
-
