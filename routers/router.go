@@ -11,7 +11,6 @@ func init() {
 	web.Router("/breeds", &controllers.MainController{}, "get:GetBreeds")
 	web.Router("/random-cat", &controllers.MainController{}, "get:GetRandomCat")
 	web.Router("/breed-images/", &controllers.MainController{}, "get:GetBreedImages")
-	web.Router("/favorite", &controllers.MainController{}, "post:AddFavorite")
 	// New route to fetch all images for a specific breed
 	web.Router("/breed-images/:breed_id", &controllers.MainController{}, "get:GetBreedImages")
 	// for favorite

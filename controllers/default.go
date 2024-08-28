@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"cat-api-project/models"
 	"encoding/json"
+	"io"
+	"net/http"
+
 	"github.com/beego/beego/v2/core/config"
 	"github.com/beego/beego/v2/server/web"
-	"io/ioutil"
-	"net/http"
 )
 
 type MainController struct {
@@ -100,7 +101,7 @@ func (c *MainController) GetBreedImages() {
 // ======  favorite  ======
 
 func (c *MainController) AddFavorite() {
-
+	apiKey, _ := config.String("catApiKey")
 	var favoriteData struct {
 		CatId string `json:"catId"`
 	}
@@ -133,7 +134,7 @@ func (c *MainController) AddFavorite() {
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("x-api-key", "live_5NZPJugs0kuNWqvp9JSSzI7EFywdFCC6hdRiwktABBZq9Mmfwi6jjbUcd4rqSlEw") // Replace with your actual API key
+	req.Header.Set("x-api-key", apiKey) // Replace with your actual API key
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -145,7 +146,7 @@ func (c *MainController) AddFavorite() {
 	defer resp.Body.Close()
 
 	// Read the response body
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		c.Data["json"] = map[string]string{"error": "Failed to read response from The Cat API"}
 		c.ServeJSON()
@@ -158,6 +159,7 @@ func (c *MainController) AddFavorite() {
 }
 
 func (c *MainController) GetFavorites() {
+	apiKey, _ := config.String("catApiKey")
 	// Prepare the request to The Cat API
 	apiURL := "https://api.thecatapi.com/v1/favourites?sub_id=demo-0.060766054451763274" // Replace with your actual sub_id
 	req, err := http.NewRequest("GET", apiURL, nil)
@@ -166,7 +168,7 @@ func (c *MainController) GetFavorites() {
 		c.ServeJSON()
 		return
 	}
-	req.Header.Set("x-api-key", "live_5NZPJugs0kuNWqvp9JSSzI7EFywdFCC6hdRiwktABBZq9Mmfwi6jjbUcd4rqSlEw") // Replace with your actual API key
+	req.Header.Set("x-api-key", apiKey) // Replace with your actual API key
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -178,7 +180,7 @@ func (c *MainController) GetFavorites() {
 	defer resp.Body.Close()
 
 	// Read the response body
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		c.Data["json"] = map[string]string{"error": "Failed to read response from The Cat API"}
 		c.ServeJSON()

@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     const breedSearch = document.getElementById('breedSearch');
     const breedList = document.getElementById('breedList');
