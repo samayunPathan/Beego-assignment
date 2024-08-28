@@ -49,8 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
         breedSearch.value = breed.name;
         breedList.style.display = 'none';
         breedInfo.innerHTML = `
-            <h2>${breed.name} (${breed.origin})</h2>
+            <h3>${breed.name} (${breed.origin}) ${breed.id}</h3>
             <p>${breed.description || 'No description available.'}</p>
+            <a href="${breed.wikipedia_url}" target="_blank">Wikipedia</a>
         `;
         await fetchCatByBreed(breed.id);
     };
@@ -118,13 +119,18 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const updateButtonVisibility = () => {
-        votingContainer.style.display = 'block';
+        if (currentMode === 'breeds') {
+            votingContainer.style.display = 'none';
+        } else {
+            votingContainer.style.display = 'block';
+        }
     };
 
     const setMode = (mode) => {
         currentMode = mode;
         document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
         document.getElementById(`${mode}Btn`).classList.add('active');
+        updateButtonVisibility();
 
         if (autoImageInterval) {
             clearInterval(autoImageInterval);
@@ -204,3 +210,5 @@ document.addEventListener('DOMContentLoaded', () => {
         setMode('voting');
     });
 });
+
+

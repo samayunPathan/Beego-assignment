@@ -8,8 +8,9 @@ type Cat struct {
 }
 
 type Breed struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Origin      string `json:"origin"`
+	ID           string `json:"id"`
+	Name         string `json:"name"`
+	Description  string `json:"description"`
+	Origin       string `json:"origin"`
+	WikipediaURL string `json:"wikipedia_url"` // Add this field
 }
