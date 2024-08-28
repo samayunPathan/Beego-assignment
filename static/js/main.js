@@ -136,15 +136,23 @@ document.addEventListener('DOMContentLoaded', () => {
             clearInterval(autoImageInterval);
             autoImageInterval = null;
         }
-
         if (mode === 'voting') {
             fetchRandomCat();
+            breedSelector.style.display = 'none';
+            breedInfo.style.display = 'none'; // Hide breed info in voting mode
         } else if (mode === 'breeds') {
             breedSelector.style.display = 'block';
+            breedInfo.style.display = 'block'; // Show breed info in breeds mode
             catContainer.innerHTML = '';
             breedInfo.innerHTML = '';
             updateBreedList();
+        } else if (mode === 'favs') {
+            breedSelector.style.display = 'none';
+            breedInfo.style.display = 'none'; // Hide breed info in favs mode
+            fetchRandomCat();
         }
+
+
     };
 
     votingBtn.addEventListener('click', () => {
