@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentMode = 'voting';
     let currentCatId = null;
     let currentBreed = null;
+    let autoImageInterval = null;
 
     const fetchBreeds = async () => {
         try {
@@ -56,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const fetchCatByBreed = async (breedId) => {
         try {
-            // Corrected route to match your server-side Go route
             const response = await fetch(`/breed-images/${breedId}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -70,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let currentImageIndex = 0;
     
-            // Function to display the current image
             const displayImage = () => {
                 const imageContainer = document.getElementById("catContainer");
                 if (!imageContainer) {
@@ -90,12 +89,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentImageIndex = (currentImageIndex + 1) % images.length;
             };
     
-            // Display the first image immediately
             displayImage();
-    
-            // Change the image every 3 seconds
-            setInterval(displayImage, 3000);
-    
+
+            if (currentMode === 'breeds') {
+                autoImageInterval = setInterval(displayImage, 3000);
+            }
+
         } catch (error) {
             console.error('Error fetching cat by breed:', error);
         }
@@ -126,21 +125,31 @@ document.addEventListener('DOMContentLoaded', () => {
         currentMode = mode;
         document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
         document.getElementById(`${mode}Btn`).classList.add('active');
+
+        if (autoImageInterval) {
+            clearInterval(autoImageInterval);
+            autoImageInterval = null;
+        }
+
+        if (mode === 'voting') {
+            fetchRandomCat();
+        } else if (mode === 'breeds') {
+            breedSelector.style.display = 'block';
+            catContainer.innerHTML = '';
+            breedInfo.innerHTML = '';
+            updateBreedList();
+        }
     };
 
     votingBtn.addEventListener('click', () => {
         setMode('voting');
         breedSelector.style.display = 'none';
         breedInfo.innerHTML = '';
-        fetchRandomCat();
     });
 
     breedsBtn.addEventListener('click', () => {
         setMode('breeds');
         breedSelector.style.display = 'block';
-        catContainer.innerHTML = '';
-        breedInfo.innerHTML = '';
-        updateBreedList();
     });
 
     favsBtn.addEventListener('click', () => {
@@ -152,6 +161,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     breedSearch.addEventListener('input', updateBreedList);
 
+    const handleVote = async (voteType) => {
+        if (currentCatId) {
+            try {
+                await fetch(`/vote`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ catId: currentCatId, vote: voteType })
+                });
+                if (currentMode === 'voting') {
+                    fetchRandomCat();
+                }
+            } catch (error) {
+                console.error('Error voting:', error);
+            }
+        }
+    };
+
     favoriteButton.addEventListener('click', async () => {
         if (currentCatId) {
             try {
@@ -160,46 +186,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ catId: currentCatId })
                 });
-                alert('Cat added to favorites!');
+                if (currentMode === 'voting') {
+                    fetchRandomCat();
+                }
             } catch (error) {
                 console.error('Error adding to favorites:', error);
             }
         }
     });
 
-    likeButton.addEventListener('click', async () => {
-        if (currentCatId) {
-            try {
-                await fetch(`/vote`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ catId: currentCatId, vote: 'like' })
-                });
-                alert('You liked this cat!');
-            } catch (error) {
-                console.error('Error voting:', error);
-            }
-        }
-    });
+    likeButton.addEventListener('click', () => handleVote('like'));
 
-    dislikeButton.addEventListener('click', async () => {
-        if (currentCatId) {
-            try {
-                await fetch(`/vote`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ catId: currentCatId, vote: 'dislike' })
-                });
-                alert('You disliked this cat!');
-            } catch (error) {
-                console.error('Error voting:', error);
-            }
-        }
-    });
+    dislikeButton.addEventListener('click', () => handleVote('dislike'));
 
     // Initial setup
     fetchBreeds().then(() => {
         setMode('voting');
-        fetchRandomCat();
     });
 });
