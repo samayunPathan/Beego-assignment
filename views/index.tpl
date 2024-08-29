@@ -12,7 +12,7 @@
             <button id="votingBtn" class="active">Voting</button>
             <button id="breedsBtn">Breeds</button>
             <button id="favsBtn">Favs</button>
-            <button id="votesBtn">Votes</button> 
+            <button id="votesBtn">Voted</button> 
         </nav>
 
         <!-- Breed Search Container -->

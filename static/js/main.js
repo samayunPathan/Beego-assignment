@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const displayVoteImage = () => {
             const vote = votes[currentVoteIndex];
-            const voteValue = vote.value === 1 ? ' 👍' : ' 👎';
+            const voteValue = vote.value === 1 ? ' UpVote 👍' : ' DownVote 👎';
             catContainer.innerHTML = `
                 <div>
                     <img src="${vote.image.url}" alt="Favorite Cat" width="500" height="375">
