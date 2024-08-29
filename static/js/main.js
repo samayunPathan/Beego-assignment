@@ -196,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     image_id: imageId,
                     value: isUpvote,
-                    sub_id: 'demo-0.060766054451763274' 
+                    sub_id: 'demo-samayun'
                 })
             });
 
@@ -206,9 +206,10 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error voting for cat:', error);
         }
     };
+
     const fetchVotes = async () => {
         try {
-            const response = await fetch('/votes'); 
+            const response = await fetch('/votes');
             const votes = await response.json();
             console.log('Fetched votes:', votes);
             if (votes.length > 0) {
@@ -231,7 +232,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const displayVoteImage = () => {
             const vote = votes[currentVoteIndex];
-            catContainer.innerHTML = `<img src="${vote.image.url}" alt="Favorite Cat" width="500" height="375">`;
+            const voteValue = vote.value === 1 ? ' 👍' : ' 👎';
+            catContainer.innerHTML = `
+                <div>
+                    <img src="${vote.image.url}" alt="Favorite Cat" width="500" height="375">
+                    <p>${voteValue}</p>
+                </div>
+            `;
             currentCatId = vote.image.id;
 
             currentVoteIndex = (currentVoteIndex + 1) % votes.length;
@@ -273,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (mode === 'favs') {
             fetchFavorites();
         } else if (mode === 'votes') {
-            fetchVotes(); 
+            fetchVotes();
         }
     };
 
