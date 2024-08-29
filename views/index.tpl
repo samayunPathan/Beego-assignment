@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cat Browser</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
     <div id="app">
         <nav>
-            <button id="votingBtn" class="active">Voting</button>
-            <button id="breedsBtn">Breeds</button>
-            <button id="favsBtn">Favs</button>
-            <button id="votesBtn">Voted</button> 
+            <button id="votingBtn" class="active"><span>&#8645;</span> Voting</button>
+            <button id="breedsBtn"><i class="fas fa-search"></i> Breeds</button>
+            <button id="favsBtn"><i class="fa-solid fa-heart"></i> Favs</button>
+            <button id="votesBtn"><i class="fa-solid fa-check"></i> Voted</button> 
         </nav>
 
         <!-- Breed Search Container -->
