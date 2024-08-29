@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const breedInfo = document.getElementById('breedInfo');
     const catContainer = document.getElementById('catContainer');
     const votingBtn = document.getElementById('votingBtn');
+    const votesBtn = document.getElementById('votesBtn');
     const breedsBtn = document.getElementById('breedsBtn');
     const favsBtn = document.getElementById('favsBtn');
     const breedSelector = document.getElementById('breedSelector');
@@ -11,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const likeButton = document.getElementById('likeButton');
     const dislikeButton = document.getElementById('dislikeButton');
     const votingContainer = document.getElementById('votingContainer');
-    const favoritesContainer = document.getElementById('favoritesContainer');
+  
 
     let breeds = [];
     let currentMode = 'voting';
@@ -19,7 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentBreed = null;
     let autoImageInterval = null;
     let favorites = [];
-    let currentFavoriteIndex = 0;
+    let votes = [];
+   
 
     const fetchBreeds = async () => {
         try {
@@ -182,10 +184,72 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+
+// for vote 
+
+
+    const voteForCat = async (imageId, isUpvote) => {
+        try {
+            const response = await fetch('/vote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    image_id: imageId,
+                    value: isUpvote,
+                    sub_id: 'demo-0.060766054451763274' // Optional tracking sub_id
+                })
+            });
+            
+            const result = await response.json();
+            console.log('Vote result:', result);
+        } catch (error) {
+            console.error('Error voting for cat:', error);
+        }
+    };
+    const fetchVotes = async () => {
+        try {
+            const response = await fetch('/votes'); // Assuming your Beego route is set to /votes
+            const votes = await response.json();
+            console.log('Fetched votes:', votes);
+    
+            // Display votes on the UI
+            displayVotes(votes);
+        } catch (error) {
+            console.error('Error fetching votes:', error);
+        }
+    };
+    
+    const displayVotes = (votes) => {
+        if (votes.length === 0) {
+            catContainer.innerHTML = '<p>No favorites yet!</p>';
+            return;
+        }
+
+        let currentVoteIndex = 0;
+
+        const displayVoteImage = () => {
+            const vote = votes[currentVoteIndex];
+            catContainer.innerHTML = `<img src="${vote.image.url}" alt="Favorite Cat" width="500" height="375">`;
+            currentCatId = vote.image.id;
+
+            currentVoteIndex = (currentVoteIndex + 1) % votes.length;
+        };
+
+        displayVoteImage();
+
+        if (currentMode === 'votes') {
+            autoImageInterval = setInterval(displayVoteImage, 3000);
+        }
+    };
+    
+    /// for vote 
     const setMode = (mode) => {
         currentMode = mode;
         document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
         document.getElementById(`${mode}Btn`).classList.add('active');
+
         updateButtonVisibility();
 
         if (autoImageInterval) {
@@ -207,12 +271,16 @@ document.addEventListener('DOMContentLoaded', () => {
             updateBreedList();
         } else if (mode === 'favs') {
             fetchFavorites();
+        } else if (mode === 'votes') {
+            // document.getElementById('votes-container').style.display = 'block'; // Show votes
+            fetchVotes(); // Fetch votes from the server
         }
     };
 
     votingBtn.addEventListener('click', () => setMode('voting'));
     breedsBtn.addEventListener('click', () => setMode('breeds'));
     favsBtn.addEventListener('click', () => setMode('favs'));
+    votesBtn.addEventListener('click', () => setMode('votes')); // Add this line
 
     breedSearch.addEventListener('input', updateBreedList);
 

@@ -12,6 +12,7 @@
             <button id="votingBtn" class="active">Voting</button>
             <button id="breedsBtn">Breeds</button>
             <button id="favsBtn">Favs</button>
+            <button id="votesBtn">Votes</button> 
         </nav>
 
         <!-- Breed Search Container -->
@@ -19,7 +20,7 @@
             <input type="text" id="breedSearch" placeholder="Search for breeds...">
             <ul id="breedList"></ul>
         </div>
-        <div id="favoritesContainer" style="display: none;"></div>
+     
         <div id="catCard">
             <div id="catContainer"></div>
             <div id="votingContainer">
