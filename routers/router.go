@@ -16,8 +16,7 @@ func init() {
 	// for favorite
 	web.Router("/favorite", &controllers.MainController{}, "post:AddFavorite")
 	web.Router("/favorites", &controllers.MainController{}, "get:GetFavorites")
-	// for vote
 	// Routes for voting
-	web.Router("/vote", &controllers.MainController{}, "post:VoteCat") // Note the singular 'vote' for POST
+	web.Router("/vote", &controllers.MainController{}, "post:VoteCat")
 	web.Router("/votes", &controllers.MainController{}, "get:GetVotes")
 }

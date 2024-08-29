@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const likeButton = document.getElementById('likeButton');
     const dislikeButton = document.getElementById('dislikeButton');
     const votingContainer = document.getElementById('votingContainer');
-  
+
 
     let breeds = [];
     let currentMode = 'voting';
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let autoImageInterval = null;
     let favorites = [];
     let votes = [];
-   
+
 
     const fetchBreeds = async () => {
         try {
@@ -184,9 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-
-// for vote 
-
+    // for vote 
 
     const voteForCat = async (imageId, isUpvote) => {
         try {
@@ -198,10 +196,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     image_id: imageId,
                     value: isUpvote,
-                    sub_id: 'demo-0.060766054451763274' // Optional tracking sub_id
+                    sub_id: 'demo-0.060766054451763274' 
                 })
             });
-            
+
             const result = await response.json();
             console.log('Vote result:', result);
         } catch (error) {
@@ -210,20 +208,22 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const fetchVotes = async () => {
         try {
-            const response = await fetch('/votes'); // Assuming your Beego route is set to /votes
+            const response = await fetch('/votes'); 
             const votes = await response.json();
             console.log('Fetched votes:', votes);
-    
-            // Display votes on the UI
-            displayVotes(votes);
+            if (votes.length > 0) {
+                displayVotes(votes);
+            } else {
+                catContainer.innerHTML = '<p>No votes yet!</p>';
+            }
         } catch (error) {
             console.error('Error fetching votes:', error);
         }
     };
-    
+
     const displayVotes = (votes) => {
         if (votes.length === 0) {
-            catContainer.innerHTML = '<p>No favorites yet!</p>';
+            catContainer.innerHTML = '<p>No votes yet!</p>';
             return;
         }
 
@@ -243,8 +243,9 @@ document.addEventListener('DOMContentLoaded', () => {
             autoImageInterval = setInterval(displayVoteImage, 3000);
         }
     };
-    
-    /// for vote 
+
+    /// end for vote 
+
     const setMode = (mode) => {
         currentMode = mode;
         document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
@@ -266,14 +267,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } else if (mode === 'breeds') {
             breedSelector.style.display = 'block';
-            breedInfo.style.display = 'block'; 
+            breedInfo.style.display = 'block';
 
             updateBreedList();
         } else if (mode === 'favs') {
             fetchFavorites();
         } else if (mode === 'votes') {
-            // document.getElementById('votes-container').style.display = 'block'; // Show votes
-            fetchVotes(); // Fetch votes from the server
+            fetchVotes(); 
         }
     };
 
@@ -313,7 +313,6 @@ document.addEventListener('DOMContentLoaded', () => {
     likeButton.addEventListener('click', () => handleVote('like'));
     dislikeButton.addEventListener('click', () => handleVote('dislike'));
 
-    // Initial setup
     fetchBreeds().then(() => {
         setMode('voting');
     });
