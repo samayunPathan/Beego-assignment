@@ -14,7 +14,7 @@ body {
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 650px; /* Control the maximum width */
+    max-width: 650px; 
     text-align: center;
     position: static;
 }
@@ -51,13 +51,13 @@ nav button.active {
 #catContainer {
     background-color: #f9f9f9;
     color: #333;
-    max-height: 400px; /* Keep the height consistent */
+    max-height: 400px; 
 }
 
 #catContainer img {
     width: 100%;
     height: auto;
-    max-height: 300px; /* Control the height of the images */
+    max-height: 300px;
     object-fit: cover;
     display: block;
     margin: 0 auto;
@@ -138,4 +138,5 @@ nav button.active {
     color: #555;
 }
 
-
+ 
+ 
