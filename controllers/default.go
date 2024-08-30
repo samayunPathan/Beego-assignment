@@ -212,6 +212,38 @@ func (c *MainController) GetFavorites() {
 	c.Ctx.ResponseWriter.Write(body)
 }
 
+// delete fav
+
+func (c *MainController) DeleteFavorite() {
+	apiKey, _ := config.String("catApiKey")
+	favoriteID := c.Ctx.Input.Param(":favorite_id")
+	apiURL := "https://api.thecatapi.com/v1/favourites/" + favoriteID
+
+	req, err := http.NewRequest("DELETE", apiURL, nil)
+	if err != nil {
+		handleAPIError(c, err, "Failed to create HTTP request")
+		return
+	}
+	req.Header.Set("x-api-key", apiKey)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		handleAPIError(c, err, "Failed to send request to The Cat API")
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		handleAPIError(c, err, "Failed to delete favorite")
+		return
+	}
+
+	c.Ctx.ResponseWriter.WriteHeader(resp.StatusCode)
+}
+
+// end del fav
+
 func (c *MainController) VoteCat() {
 	apiKey, _ := web.AppConfig.String("catApiKey")
 	var voteData struct {

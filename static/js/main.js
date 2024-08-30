@@ -160,30 +160,60 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error fetching favorites:', error);
         }
     };
-
+    
     const displayFavorites = (favorites) => {
         if (favorites.length === 0) {
             catContainer.innerHTML = '<p>No favorites yet!</p>';
             return;
         }
-
+    
         let currentFavoriteIndex = 0;
-
+    
         const displayFavoriteImage = () => {
             const favorite = favorites[currentFavoriteIndex];
-            catContainer.innerHTML = `<img src="${favorite.image.url}" alt="Favorite Cat" width="500" height="375">`;
+            catContainer.innerHTML = `
+                <div>
+                    <img src="${favorite.image.url}" alt="Favorite Cat" width="500" height="375">
+                </div>
+                <div>
+                 <button class="delete-favorite" data-id="${favorite.id}">Remove</button>
+                </div>
+            `;
             currentCatId = favorite.image.id;
-
+    
+            const deleteButtons = document.querySelectorAll('.delete-favorite');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', async (event) => {
+                    const favoriteId = event.target.getAttribute('data-id');
+                    await deleteFavorite(favoriteId);
+                    fetchFavorites(); // Refresh favorites list
+                });
+            });
+    
             currentFavoriteIndex = (currentFavoriteIndex + 1) % favorites.length;
         };
-
+    
         displayFavoriteImage();
-
+    
         if (currentMode === 'favs') {
             autoImageInterval = setInterval(displayFavoriteImage, 3000);
         }
     };
-
+    
+    const deleteFavorite = async (favoriteId) => {
+        try {
+            const response = await fetch(`/favorites/delete/${favoriteId}`, {
+                method: 'DELETE',
+            });
+            if (!response.ok) {
+                throw new Error(`Failed to delete favorite with ID ${favoriteId}`);
+            }
+            console.log(`Deleted favorite with ID ${favoriteId}`);
+        } catch (error) {
+            console.error('Error deleting favorite:', error);
+        }
+    };
+    
     // for vote 
 
     const voteForCat = async (imageId, isUpvote) => {

@@ -11,11 +11,12 @@ func init() {
 	web.Router("/breeds", &controllers.MainController{}, "get:GetBreeds")
 	web.Router("/random-cat", &controllers.MainController{}, "get:GetRandomCat")
 	web.Router("/breed-images/", &controllers.MainController{}, "get:GetBreedImages")
-	// New route to fetch all images for a specific breed
+	// fetch all images for a specific breed
 	web.Router("/breed-images/:breed_id", &controllers.MainController{}, "get:GetBreedImages")
 	// for favorite
 	web.Router("/favorite", &controllers.MainController{}, "post:AddFavorite")
 	web.Router("/favorites", &controllers.MainController{}, "get:GetFavorites")
+	web.Router("/favorites/delete/:favorite_id", &controllers.MainController{}, "delete:DeleteFavorite")
 	// Routes for voting
 	web.Router("/vote", &controllers.MainController{}, "post:VoteCat")
 	web.Router("/votes", &controllers.MainController{}, "get:GetVotes")

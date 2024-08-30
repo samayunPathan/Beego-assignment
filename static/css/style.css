@@ -14,7 +14,7 @@ body {
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 450px; /* Control the maximum width */
+    max-width: 650px; /* Control the maximum width */
     text-align: center;
     position: static;
 }
@@ -138,11 +138,4 @@ nav button.active {
     color: #555;
 }
 
-#topFavoriteButton {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #555;
-}
 
