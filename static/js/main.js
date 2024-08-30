@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
             autoImageInterval = setInterval(() => {
                 currentIndex = (currentIndex + 1) % items.length;
                 showImage();
-            }, 7000);
+            }, 3400);
         }
     };
 
